@@ -1,0 +1,31 @@
+version: '3.6'
+services:
+  node:
+    restart: always
+    build: ./node-example
+    environment:
+      - REDIS_HOST=aof
+    ports:
+      - 3001:3000
+    volumes:
+      - ./node-example:/code
+  rdb:
+    image: redis:6.0.9
+    command: redis-server --bind rdb --requirepass secret --maxmemory 256mb
+    volumes:
+      - rdb_data:/data
+  aof:
+    image: redis:6.0.9
+    command: redis-server --bind aof --requirepass secret --maxmemory 256mb --appendonly yes
+    volumes:
+      - aof_data:/data
+  redis:
+    image: redis:6.0.9
+  beanstalkd:
+    image: schickling/beanstalkd
+    volumes:
+      - beanstalkd_data:/var/lib/beanstald
+volumes:
+  beanstalkd_data: {}
+  aof_data: {}
+  rdb_data: {}
